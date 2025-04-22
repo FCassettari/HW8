@@ -1,6 +1,6 @@
 /******************************************************************
  *
- *   ADD YOUR NAME / SECTION NUMBER HERE
+ *   Fiore Cassettari / 002
  *
  *   This java file contains the problem solutions of canFinish and
  *   numGroups methods.
@@ -72,18 +72,47 @@ class ProblemSolutions {
      * @return boolean          - True if all exams can be taken, else false.
      */
 
-    public boolean canFinish(int numExams, 
-                             int[][] prerequisites) {
-      
-        int numNodes = numExams;  // # of nodes in graph
+    public boolean canFinish(int numExams, int[][] prerequisites) {
+        int numNodes = numExams;
 
-        // Build directed graph's adjacency list
-        ArrayList<Integer>[] adj = getAdjList(numExams, 
-                                        prerequisites); 
+        ArrayList<Integer>[] adj = new ArrayList[numNodes];
+        for (int i = 0; i < numNodes; i++) {
+            adj[i] = new ArrayList<>();
+        }
+        for (int[] edge : prerequisites) {
+            adj[edge[0]].add(edge[1]);
+        }
 
-        // ADD YOUR CODE HERE - ADD YOUR NAME / SECTION AT TOP OF FILE
-        return false;
+        int[] visited = new int[numNodes]; //0 = unvisited 1 = visiting 2 = visited
 
+        for (int node = 0; node < numNodes; node++) {
+            if (visited[node] != 0) continue;
+
+            Stack<Integer> stack = new Stack<>();
+            stack.push(node);
+
+            while (!stack.isEmpty()) {
+                int current = stack.peek();
+
+                if (visited[current] == 0) {
+                    visited[current] = 1; //visiting
+
+                    for (int neighbor : adj[current]) {
+                        if (visited[neighbor] == 0) {
+                            stack.push(neighbor);
+                        } else if (visited[neighbor] == 1) {
+                            //detected
+                            return false;
+                        }
+                    }
+                } else {
+                    stack.pop();
+                    visited[current] = 2; //mark as visited
+                }
+            }
+        }
+
+        return true;
     }
 
 
@@ -165,34 +194,39 @@ class ProblemSolutions {
 
     public int numGroups(int[][] adjMatrix) {
         int numNodes = adjMatrix.length;
-        Map<Integer,List<Integer>> graph = new HashMap();
-        int i = 0, j =0;
-
-        /*
-         * Converting the Graph Adjacency Matrix to
-         * an Adjacency List representation. This
-         * sample code illustrates a technique to do so.
-         */
-
-        for(i = 0; i < numNodes ; i++){
-            for(j = 0; j < numNodes; j++){
-                if( adjMatrix[i][j] == 1 && i != j ){
-                    // Add AdjList for node i if not there
-                    graph.putIfAbsent(i, new ArrayList());
-                    // Add AdjList for node j if not there
-                    graph.putIfAbsent(j, new ArrayList());
-
-                    // Update node i adjList to include node j
+        Map<Integer, List<Integer>> graph = new HashMap<>();
+        for (int i = 0; i < numNodes; i++) {
+            for (int j = 0; j < numNodes; j++) {
+                if (adjMatrix[i][j] == 1 && i != j) {
+                    graph.putIfAbsent(i, new ArrayList<>());
+                    graph.putIfAbsent(j, new ArrayList<>());
                     graph.get(i).add(j);
-                    // Update node j adjList to include node i
                     graph.get(j).add(i);
                 }
             }
         }
+        boolean[] visited = new boolean[numNodes];
+        int groupCount = 0;
+        for (int i = 0; i < numNodes; i++) {
+            if (!visited[i]) {
+                Stack<Integer> stack = new Stack<>();
+                stack.push(i);
+                while (!stack.isEmpty()) {
+                    int current = stack.pop();
+                    if (!visited[current]) {
+                        visited[current] = true;
 
-        // YOUR CODE GOES HERE - you can add helper methods, you do not need
-        // to put all code in this method.
-        return -1;
+                        for (int neighbor : graph.getOrDefault(current, new ArrayList<>())) {
+                            if (!visited[neighbor]) {
+                                stack.push(neighbor);
+                            }
+                        }
+                    }
+                }
+                groupCount++;
+            }
+        }
+        return groupCount;
     }
 
 }

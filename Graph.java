@@ -1,6 +1,6 @@
 /******************************************************************
  *
- *   YOUR NAME / SECTION NUMBER
+ *   Fiore Cassettari / 002
  *
  *   Note, additional comments provided throughout this source code
  *   is for educational purposes
@@ -101,10 +101,26 @@ public class Graph {
    * and/or more than one root vertex, then return -1.
    * 
    */
-  
-  public int findRoot() {
 
-    // ADD YOUR CODE HERE - DO NOT FORGET TO ADD YOUR NAME/SECTION AT TOP OF FILE
-    return -1;
-  } 
+  public int findRoot() {
+    int[] inDegree = new int[numVertices];
+    for (int i = 0; i < numVertices; i++) {
+      for (int neighbor : adjListArr[i]) {
+        inDegree[neighbor]++;
+      }
+    }
+
+    int rootIndex = -1;
+    for (int i = 0; i < numVertices; i++) {
+      if (inDegree[i] == 0) {
+        if (rootIndex == -1) {
+          rootIndex = i;
+        } else {
+          return -1;
+        }
+      }
+    }
+
+    return rootIndex == -1 ? -1 : vertexValues.get(rootIndex);
+  }
 }
